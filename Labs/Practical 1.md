@@ -140,9 +140,9 @@ The jargons will be explained below:
 
 3. **call_function** applies a free function to some values. 
 
-4. **call_module** applies a module in the module hierarchy’s forward() method to given arguments. 
+4. **call_module** represents object-specific method invocation.
 
-5. **call_method** calls a method on a value.
+5. **call_method** call_method stands for the nn.model layers. In this task, it usually corresponds to `nn.Linear`, `nn.ReLU`, and `nn.BatchNorm1d`.
 
 6. **output** contains the output of the traced function in its args[0] attribute. 
 
