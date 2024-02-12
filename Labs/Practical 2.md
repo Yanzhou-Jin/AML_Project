@@ -9,16 +9,26 @@ Model Size： 指模型所占用的存储空间大小，在本实验中由参数
 FLOPs： 模型进行推理或训练时所涉及的浮点运算数的数量。 FLOPs 越少，说明模型的运算量越少，在计算上更高效，计算速度越快。 -->
 During the search process, in addition to accuracy and loss, some additional metrics are added to evaluate the quality of the model. The definitions of metrics considered in this task are listed below:
 
-* Latency: In this task, Latency is defined as the time required for model operation, that is, the time interval from input data to output result generation. Lower latency means better real-time performance of the model.
-
-* Model Size: refers to the size of the storage space occupied by the model, which is represented by the number of parameters in this experiment. Smaller model sizes reduce RAM usage and help run on IO bounded platforms.
+* Latency: In this task, Latency is defined as the time required for model operation, that is, the time interval from input data to output result generation of each batch. Lower latency means better real-time performance of the model.
+```
+    ...
+        elif j == num_batchs:
+            end_time.record()
+            torch.cuda.synchronize()  # Wait for all GPU operations to finish
+            latency = start_time.elapsed_time(end_time) / num_batchs
+    ...
+```
+* Model Size: refers to the size of the storage space occupied by the model, which is represented by the number of parameters in this experiment. Smaller model sizes reduce RAM usage and help run on IO bounded platforms. This information is collected together with FLOPS using the function `get_model_profile` , which is from the package of deepspeed.
 
 * FLOPs: The number of floating point operations involved in a model's inference or training. The fewer FLOPs, the less computational complexity the model requires, the more computationally efficient it is, and the faster the calculation speed.
-
+```
+    flops, macs, params = get_model_profile(model=mg.model, input_shape=tuple(dummy_in['x'].shape))
+```
 
 
 ## 2. Implement some of these additional metrics and attempt to combine them with the accuracy or loss quality metric. It’s important to note that in this particular case, accuracy and loss actually serve as the same quality metric (do you know why?).
-通过在search space上搜索，得到表格如下：
+
+By implementing such metrics searching on SEARCH SPACE, and obtained the table below:
 
 | Search History    | Recorded Accuracies | Recorded Losses | Recorded Latencies | Recorded Model Sizes | Recorded FLOPS |
 |-------------------|---------------------|-----------------|--------------------|----------------------|-----------------|
@@ -31,7 +41,7 @@ During the search process, in addition to accuracy and loss, some additional met
 | [(8, 6), (8, 4)]   | 0.446428579943521  | 1.3556          | 0.997523212432861 | 117                  | 1.92 K          |
 | [(8, 6), (4, 2)]   | 0.445238104888371  | 1.3406          | 0.990246391296387 | 117                  | 1.92 K          |
 | [(8, 4), (16, 8)]  | 0.466666681425912  | 1.2558          | 0.975551986694336 | 117                  | 1.92 K          |
-| [(8, 4), (8, 6)]   | 0.533333337732724  | 1.2949          | 1.006764793396    | 117                  | 1.92 K          |
+| **[(8, 4), (8, 6)]**   | **0.533333337732724**  |**1.2949**           | **1.006764793396**    | **117**                  | **1.92 K**          |
 | [(8, 4), (8, 4)]   | 0.523412704467773  | 1.3038          | 1.02436475753784  | 117                  | 1.92 K          |
 | [(8, 4), (4, 2)]   | 0.383928579943521  | 1.3025          | 1.22784004211426  | 117                  | 1.92 K          |
 | [(4, 2), (16, 8)]  | 0.516071438789368  | 1.3339          | 0.942265605926514 | 117                  | 1.92 K          |
@@ -166,7 +176,7 @@ The search results are shown in the following table:
 | Search History                     | Recorded Accuracies | Recorded Losses | Recorded Latencies | Recorded Model Sizes | Recorded FLOPS |
 |------------------------------------|---------------------|------------------|---------------------|----------------------|-----------------|
 | [1, (1, 1), (1, 1), (1, 1), 1]     | 0.227976194449833   | 1.605            | 0.556281614303589  | 3.01 K               | 47.27 K         |
-| [1, (1, 1), (1, 2), (2, 1), 1]     | 0.251349210739136   | 1.6107           | 0.578835201263428  | 5.45 K               | 85.67 K         |
+| **[1, (1, 1), (1, 2), (2, 1), 1]**     | **0.251349210739136**   | **1.6107**           | **0.578835201263428**  | **5.45 K**               | **85.67 K**         |
 | [1, (1, 1), (1, 4), (4, 1), 1]     | 0.164285718330315   | 1.6147           | 0.608767986297607  | 10.31 K              | 162.47 K        |
 | [1, (1, 1), (1, 8), (8, 1), 1]     | 0.200000000851495   | 1.6066           | 0.62422399520874   | 20.04 K              | 316.07 K        |
 | [1, (1, 1), (1, 16), (16, 1), 1]   | 0.228571429848671   | 1.6086           | 0.707788801193237  | 39.49 K              | 623.27 K        |
