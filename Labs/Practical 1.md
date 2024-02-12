@@ -9,7 +9,7 @@ The comparision between each trails is shown as follows：
 
 <img src="imgs/1.png" width="800" />
 
-Where BS reffers to batch size, ME reffers to max epoch, and LR7 reffers to `learning rate = 1e-7`. As can be seen from the figure above, the training and test verification accuracy under various parameter configurations are close, and there is no obvious overfitting. This is because the model has only three layers of network and is relatively simple.
+Where BS reffers to batch size, ME reffers to max epoch, and LR7 reffers to `learning rate = 1e-7`. As can be seen from the figure above these three factors significantly influence the model's performance. Additionally, the training and test verification accuracy under various parameter configurations are close, and there is no obvious overfitting. This is because the model has only three layers of network and is relatively simple.
 
 The problem is analyzed below:
 ## 1. What is the impact of varying batch sizes and why?
@@ -48,7 +48,7 @@ In order to verify the relationship between learning rate and batch size, two ad
 
 ## 4. Implement a network that has in total around 10x more parameters than the toy network.
 
-In this problem, a neural network with approximately 10 times the number of parameters than the "toy" network is proposed. The original model (hereinafter referred to as 1X) comprises 327 parameters, while the model with approximately 10 times more parameters (hereinafter referred to as 10X) consists of 4.4k parameters. The 10X network has more layers and input and output features to increase the complexity of the model. The network structure is shown in the figure below:
+In this problem, a network with approximately 10 times the number of parameters than the "toy" network is proposed. The original model (hereinafter referred to as 1X) comprises 327 parameters, while the model with approximately 10 times more parameters (hereinafter referred to as 10X) consists of 4.4k parameters. The 10X network has more layers and input and output features to increase the complexity of the model. The network structure is shown in the figure below:
 <img src="imgs/5.png" width="500" />
 
 During the construction of the model, `sigmoid` and `tanh` were utilized as activation functions, and the values of the input and output features of the different linear layers were tried to ensure that the network had a better performance. This manual tuning of the parameters is very time consuming and the tuning method in Lab4 should be used.
@@ -149,15 +149,13 @@ The jargons will be explained below:
 
 ## 2. What are the functionalities of `profile_statistics_analysis_pass` and `report_node_meta_param_analysis_pass` respectively?
 
-1. **profile_statistics_analysis_pass**: This function is designed to perform profile statistics analysis on MaseGraph. The input parameters includes Arguments for the analysis pass, specifying various parameters for the analysis, such as the mode of analysis, target nodes for weight and activation statistics, configurations for weight and activation statistics, and input generator for activation profiling.
+1. **profile_statistics_analysis_pass**: This function is designed to perform profile statistics analysis on MaseGraph, it focuses on profiling and analyzing statistics related to weights and activations in a graph. The input parameters includes Arguments for the analysis pass, specifying various parameters for the analysis, such as the mode of analysis, target nodes for weight and activation statistics, configurations for weight and activation statistics, and input generator for activation profiling.
 
-  First, it calls several graph iterator functions to perform different aspects of the analysis, such as registering statistic collections, profiling weights, profiling activations, and computing and unregistering statistics. then, it returns a tuple containing the modified MaseGraph and an empty dictionary.
+First, the pass calls several graph iterator functions to perform different aspects of the analysis, such as registering statistic collections, profiling weights, profiling activations, and computing and unregistering statistics. Then, it returns a tuple containing the modified MaseGraph and an empty dictionary.
 
-2. **report_node_meta_param_analysis_pass**: This function is designed to perform meta parameter analysis on nodes in MaseGraph and generate a report. It contains MaseGraph itself and optional arguments for the analysis pass, including options like which parameters to include in the report and the path to save the report. First, It iterates through nodes in the graph and collects information about node name, Fx Node operation, Mase type, Mase operation, and additional parameters based on the specified options. It formats the collected information into a table and logs the analysis report using a logger. If a save path is provided, it also saves the report to a file. Finally, it Returns a tuple containing the analyzed MaseGraph and an empty dictionary.
+2. **report_node_meta_param_analysis_pass**: This function is designed to perform meta parameter analysis on nodes in MaseGraph and produce a report, it focuses on analyzing and reporting meta parameters associated with nodes in a graph, including common, hardware, and software parameters.. It includes MaseGraph itself s well as optional arguments for the analysis pass,such as the path to save the report and the parameters to include in the report.
 
-In Conclusion:
-**profile_statistics_analysis_pass** focuses on profiling and analyzing statistics related to weights and activations in a neural network graph.
-**report_node_meta_param_analysis_pass** focuses on analyzing and reporting meta parameters associated with nodes in a neural network graph, including common, hardware, and software parameters.
+First, It gathers data about node name, Fx Node operation, Mase type, Mase operation, and other parameterss based on the specified options. It uses a logger to record the analysis report and transforms the gathered data into a table. If a save path is provided, it also saves the report to a file. Finally, it Returns a tuple containing the analyzed MaseGraph and an empty dictionary.
 
 
 ## 3. Explain why only 1 OP is changed after the `quantize_transform_pass` .
@@ -194,7 +192,7 @@ It can be seen from the result that only the `seq_blocks_2` is different between
 
 ## 5. Perform the same quantisation flow to the bigger JSC network that you have trained in lab1. You must be aware that now the `pass_args` for your custom network might be different if you have used more than the `Linear` layer in your network.
 
-In this task, the trained model `jsc-toy10X` is loaded. This model can be find above.
+In this task, the trained model `jsc-toy10X` is loaded. This model can be find above. The `pass_arg` is written to quantify the `linear` and `relu` layers.
 
 the result is shown as follows:
 
@@ -228,7 +226,7 @@ Also, the `mg` and 'ori_mg` is traversed, indicating the sequence block 1, 2, 4,
 | seq_blocks_12  | seq_blocks_12   | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   |
 | **seq_blocks_13**  | **seq_blocks_13**   | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
 | output         | output          | output              | output      | output        | output          | False   |
-
+It can be seen from the table above, all the Linear and relu layers have been modified, which is as expected, and the program runs with normal results.
 
 ## 6. Write code to show and verify that the weights of these layers are indeed quantised. You might need to go through the source code of the implementation of the quantisation pass and also the implementation of the [Quantized Layers](../../machop/chop/passes/transforms/quantize/quantized_modules/linear.py) .
 
@@ -245,8 +243,7 @@ In this question, the `jsc-tiny` model used in Q3 and Q4 is still used, and base
 | quantised | relu    | 8, 5   |     32    |
 | original  | relu    | 8, 5   |     32    |
 
-
-As shown in the table above, the linear layer is indeed quantified.
+As shown in the table above, the precision of quantised linear layer is different from the original version, indicating that it is indeed quantified.
 
 ## 7. Load your own pre-trained JSC network, and perform perform the quantisation using the command line interface.
 First, change the line 13 and 14 of configs/examples/jsc_toy_by_type_my.toml into following lines.
@@ -259,14 +256,19 @@ Then, run `./ch transform --config configs/examples/jsc_toy_by_type_my.toml --ta
 | Original type   | OP           |   Total |   Changed |   Unchanged |
 |-----------------|--------------|---------|-----------|-------------|
 | BatchNorm1d     | batch_norm1d |       1 |         0 |           1 |
-| Linear          | linear       |       1 |         1 |           0 |
+| **Linear**          | **linear**       |       **1** |         **1** |           **0** |
 | ReLU            | relu         |       2 |         0 |           2 |
 | output          | output       |       1 |         0 |           1 |
 | x               | placeholder  |       1 |         0 |           1 |
 
+From the table, it can be interpred that only the linear layer has been changed, aligning precisely with the result obtained in Q3.
+
 ## \[Optional] Write your own pass
 
 In this task, a self-defined pass `calculate_flops_bitops_pass` is introduced. 
+
+In this task, a custom pass named `calculate_flops_bitops_pass` is introduced. This pass utilizes the function `get_model_profile()` from DeepSpeed to obtain the FLOPs and number of parameters of the model. It then enumerates through all the nodes in the Masegraph and calculates the bit operations to determine the Bitops. The pass takes a Masegraph object graph and a dictionary pass_args as input, and returns the original graph along with a new dictionary result_dict containing total_flops and total_bitops as the output.
+
 ```
 def calculate_flops_bitops_pass(graph, pass_args: dict):
 
@@ -292,11 +294,11 @@ def calculate_flops_bitops_pass(graph, pass_args: dict):
     return graph, dict
 
 ```
-In this pass, `get_model_profile()` in deepspeed is used to get the Flops of the model, then enumerated all the nodes in `mg` and counted the bit operations to get the Bitops. This pass takes a Masegraph object `graph` and a dictionary `pass_args` as input and return original `graph` and a new dictionary `dict` containing `total_flops` and `total_bitops` as result. This pass can be called using `calculate_flops_bitops_pass(mg, pass_args)`, here is an example.
+This pass can be called using `calculate_flops_bitops_pass(mg, pass_args)`, here is an example.
 
 ```
 mg, ans = calculate_flops_bitops_pass(mg, pass_args)
 print("Total BitOPs:", ans["total_bitops"])
 print("Total FLOPs:", ans["total_flops"])
 ```
-In this task, the trained model `jsc-toy10X` is used to perform the analysis, the program runs fine and the output is ` Total BitOPs: 162368, Total FLOPs: 67.78 K`.
+In this task, the trained model jsc-toy10X is utilized. When execution, the program successfully runs, and the output obtained is Total Bitops: 162368, Total FLOPs: 67.78 K
