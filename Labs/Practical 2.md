@@ -1,12 +1,6 @@
 # Lab 3:
 ## 1. Explore additional metrics that can serve as quality metrics for the search process. For example, you can consider metrics such as latency, model size, or the number of FLOPs (floating-point operations) involved in the model.
-<!-- 在搜索过程中，除了accuracy and loss，还添加了一些额外的metrics用于评估模型的质量。在本实验中考虑的metrics的定义陈列如下：
 
-Latency： 在本实验中，Latency被定义为模型运算所需的时间，即从输入数据到输出结果生成的时间间隔。较低的延迟意味着模型具有更好的实时性。
-
-Model Size： 指模型所占用的存储空间大小，在本实验中由参数数目表示。较小的模型大小可以减小RAM的占用，并且有助于在IO bounded的平台上运行。
-
-FLOPs： 模型进行推理或训练时所涉及的浮点运算数的数量。 FLOPs 越少，说明模型的运算量越少，在计算上更高效，计算速度越快。 -->
 During the search process, in addition to accuracy and loss, some additional metrics are added to evaluate the quality of the model. The definitions of metrics considered in this task are listed below:
 
 * Latency: In this task, Latency is defined as the time required for model operation, that is, the time interval from input data to output result generation of each batch. Lower latency means better real-time performance of the model.
@@ -20,7 +14,9 @@ During the search process, in addition to accuracy and loss, some additional met
 ```
 * Model Size: refers to the size of the storage space occupied by the model, which is represented by the number of parameters in this experiment. Smaller model sizes reduce RAM usage and help run on IO bounded platforms. This information is collected together with FLOPS using the function `get_model_profile` , which is from the package of deepspeed.
 
-* FLOPs: The number of floating point operations involved in a model's inference or training. The fewer FLOPs, the less computational complexity the model requires, the more computationally efficient it is, and the faster the calculation speed.
+* FLOPs: The number of floating point operations involved in a model's entire operation. The fewer FLOPs, the less computational complexity the model requires, the more computationally efficient it is, and the faster the calculation speed.
+
+Model size and Flops can be obtained using following lines.
 ```
     flops, macs, params = get_model_profile(model=mg.model, input_shape=tuple(dummy_in['x'].shape))
 ```
@@ -50,18 +46,11 @@ By implementing such metrics searching in `search_space`, the following table is
 | [(4, 2), (4, 2)]   | 0.490476195301328  | 1.2638          | 1.11920003890991  | 117                  | 1.92 K          |
 
 
-<!-- 可以看到,在本次实验的条件下，[('data_in_width', 'data_in_frac_width'), ('weight_width', 'weight_frac_width')]等于[(8, 4), (8, 6)]时准确率最高0.533333337732724，是最优configuration。-->
-It can be seen that under the conditions of this experiment, `[('data_in_width', 'data_in_frac_width'), ('weight_width', 'weight_frac_width')]` is equal to `[(8, 4), (8, 6)]` with the highest accuracy of 0.53333333337732724 , which is the optimal configuration.
+It can be seen that under the conditions of this experiment, when `[('data_in_width', 'data_in_frac_width'), ('weight_width', 'weight_frac_width')]` is equal to `[(8, 4), (8, 6)]` , the best model is obtained, with highest accuracy of 0.53333333337732724.
 
-<!-- 同时可以注意到，在表格中，accuracy和loss表征了一致的性能，这是因为这是一个由简单模型计算的分类问题，并未出现明显的过拟合。在这种情况下，accuracy and loss 相互关联，可以视为相同的metric。对于分类问题而言，大多数情况下accuracy是被关注的指标，但是accuracy本身是个不可导的方程，因而用交叉熵作为损失函数来优化，但最终关心的还是准确度。
 
-对于loss和accuracy不一致的情况，可能有以下原因：
 
-1. 如果数据集的标签很不平均，比如80%的数据是Class 1，那么模型增加输出Class 1的比例，可能会让准确度上升，但loss的上升比例更大。本实验的数据集分布较为均匀，不属于这种情形
-2. 如果模型的准确率很大，大多数Class的正确分类概率都接近1，此时如果出现一个错误，准确率的降低会很少，但交叉熵可能会非常高。显然本实验不属于这种情形。
-3. 如果模型过拟合，则其在训练集上表现的很好，但是在测试数据上表现很差，此时模型的loss会比较小而accuracy会很低。本模型复杂度非常低，训练数据也较为充足，没有发生过拟合 -->
-
-At the same time, it can be noted that in the table, accuracy and loss represent consistent performance. This is because this is a classification problem calculated by a simple model and there is no obvious overfitting. In this case, accuracy and loss are related to each other and can be regarded as the same metric. For classification problems, accuracy is the index of concern in most cases, but accuracy itself is a non-differentiable equation, so cross-entropy is used as the loss function for optimization, but the final concern is accuracy.
+At the same time, it can be noted that in the table, accuracy and loss represent can be regarded as similar metrics. This is because this is a classification problem calculated by a simple model and there is no obvious overfitting. In this case, accuracy and loss are related to each other and can be regarded as the same metric. For classification problems, accuracy is the index of concern in most cases, but accuracy itself is a non-differentiable equation, so cross-entropy is used as the loss function for optimization, but the final concern is accuracy.
 
 For the inconsistency between loss and accuracy, there may be the following reasons:
 
@@ -75,8 +64,7 @@ For the inconsistency between loss and accuracy, there may be the following reas
 
 
 ## 3. Implement the brute-force search as an additional search method within the system, this would be a new search strategy in MASE.
-<!-- 在Mase中没有集成brute-force的策略，但是可以在`optuna.py`中加入这个方法。参考了https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html 网页。只需要在sampler_map函数中增加如下两行即可完成。
- -->
+
  In Mase, there isn't an integrated brute-force strategy, but such a method can be added to `optuna.py`. We can refer to the documentation page at [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html). To accomplish this, simply add the following lines to the `sampler_map` function:
 ```
             case "brute-force":
@@ -94,31 +82,24 @@ Brute force Best trial(s):
 
 
 ## 4. Compare the brute-force search with the TPE based search, in terms of sample efficiency. Comment on the performance difference between the two search methods
-<!-- "sample efficiency" 指的是在超参数优化过程中所需的样本数量与最终达到的性能之间的关系。换句话说，它衡量了算法在给定样本数量的情况下的性能提升速度。
 
-Brute-force Search： Brute-force 搜索方法简单直接，它会尝试所有可能的超参数组合，因此它的样本效率通常较低。它的优点是能够保证找到全局最优解（如果搜索空间足够大），但代价是需要大量的计算资源和时间。因此，在大型超参数空间中，brute-force 搜索可能不太实用，因为它的样本效率较低。
-
-TPE-based Search： TPE（Tree-structured Parzen Estimator）是一种基于贝叶斯优化的方法，它通过构建一个概率模型来估计不同超参数配置的性能，并选择最有希望的配置进行下一次评估。与brute-force搜索相比，TPE-based搜索方法通常更加高效，因为它能够在搜索过程中根据之前的结果动态调整搜索空间，更有效地探索有可能产生更好性能的超参数配置。这种动态调整的特性使得TPE-based搜索在给定样本数量的情况下通常能够找到更好的超参数配置。
-
-综上所述，TPE-based搜索方法通常比brute-force搜索方法具有更高的样本效率，因为它能够更有效地探索超参数空间，并在给定的样本数量下获得更好的性能提升。然而，值得注意的是，TPE-based搜索仍然受到初始样本数量和超参数空间的限制，因此在特定情况下可能会表现不佳。 -->
 "sample efficiency" refers to the relationship between the number of samples required during hyperparameter optimization and the final performance it achieved. In other words, it measures how quickly an algorithm improves performance for a given number of samples.
 
 Brute-force Search: The Brute-force search method is simple and straightforward. It tries all possible hyperparameter combinations, so its sample efficiency is usually lower. Its advantage is that it is guaranteed to find the global optimal solution (if the search space is large enough), but the cost is that it requires a lot of computing resources and time. Therefore, in large hyperparameter spaces, brute-force search may be less practical because it is less sample efficient.
 
 TPE-based Search: TPE (Tree-structured Parzen Estimator) is a method based on Bayesian optimization that estimates the performance of different hyperparameter configurations by building a probabilistic model and selects the most promising configuration for the next evaluation. Compared with brute-force search, the TPE-based search method is generally more efficient because it is able to dynamically adjust the search space based on previous results during the search process and more effectively explore hyperparameter configurations that are likely to produce better performance. This dynamic adjustment feature allows TPE-based search to generally find better hyperparameter configurations for a given number of samples.
 
-<!--为了验证这一观点，进行了如下实验。为了凸显搜索效率的区别，将`n_trails`缩小到5，对TPE和Brute-force搜索分别进行6组实验，记录Best trails的准确率并统计平均值。-->
 To prove this, the following experiment was conducted. To highlight the difference in search efficiency, `n_trails` was decreased to 1 and `search_space` is expand to approximately double its size. In total, 6 sets of experiments were conducted for TPE and Brute-force searches, respectively, where the accuracy of Best trails was recorded and averaged statistically.
 
 | Sampler |  Brute-force      | TPE      |
 |---------|-------------|-------------|
 |  Best trails accuracy  | 0.4878571429| 0.5005714286|
 
-It can be observed from the table that TPE has better performance than Brute-force search. In conclusion, the TPE search method is generally more sample efficient than the brute-force search method. It can find better . However, it is worth noting that TPE-based search is still limited by the initial number of samples and hyperparameter space, and thus may perform poorly in specific situations.
+It can be observed from the table that TPE has better performance than Brute-force search. In conclusion, the TPE search method is generally more sample efficient than the brute-force search method and it is more robust. It can find the nearly optimal model in a few trails.
+
+
 # Lab 4:
 ## 1. Can you edit your code, so that we can modify the above network to have layers expanded to double their sizes? Note: you will have to change the ReLU also.
-<!-- 代码被修改了，使得能够将每层的参数乘以2.更改的思路是增加`instantiate_relu`函数,使得ReLU函数也能被修改。同时在`redefine_linear_Relu_transform_pass`中增加对于`name`的判断，如果`name="inplace"`则进入对于ReLU的修改。反之则进入对`linear`层的修改。
-需要特别声明的是`nn.ReLU`中只有一个可以更改的参数`inplace`，这是一个bool变量，表示是否在原地进行ReLU计算，只要大于0，对于结果都没有影响。因此我认为对于`ReLU`层，无需特别注明参数数目。 -->
 
 The code has been modified to double the parameters of each layer (including ReLU). The modification method includes adding a function called `instantiate_relu` to be able to modify the `ReLU` function. Apart from that, a check of the name parameter is added to the function`redefine_linear_Relu_transform_pass`. If `name` equals to `"inplace"`, the `ReLU` layer will be modified; otherwise, the linear layer is modified.
 ```
@@ -153,8 +134,7 @@ mg=reload_mg()
 It is worth noting that there is only one changeable parameter inplace in `nn.ReLU()`, which is a Bool variable indicating whether to perform the `ReLU` operation in origianl place. Thus, as long as it is greater than 0, the result is not affected. Therefore, I think there is no need to specify the number of parameters when making modifications to the ReLU layer.
 
 ## 2. In lab3, we have implemented a grid search, can we use the grid search to search for the best channel multiplier value?
-<!-- 可以，我们只需要定义`search_spaces`，分别改变每一层的`channel_multiplier`即可。像第三问一样，首先建立一个list,存储所有可能的乘数。然后建立包含所有乘数的`search_spaces`。需要注意的是由于三个线性层第一个只改了输出层，第二个将输入和输出scales uniformly，第三个只改变了输入层，因此这三层网络的乘数应该一样。所以严格意义上，这个过程是从list中一一枚举。
-结果如下： -->
+
 Yes, we only need to define `search_spaces` and change the `channel_multiplier` of each layer separately. Like the third question, first create a list to store all possible multipliers. Then we create `search_spaces` containing all multipliers. It should be noted that since the first of those three linear layers only affects the output layer, the second scales both the input and output uniformly, and the third only modifies the input layer, the multipliers for these three layers of networks should be the same. Therefore, to be extact, this process involves enumerating one by one from the list.
 ```
 # base configuration
@@ -195,11 +175,10 @@ The outcome of the search process are as follows.
 | 16           | 0.188690478248256   | 1.6157          | 0.776793622970581 | 539.17 K             | 8.61 M          |
 | 64           | 0.14880952664784    | 1.608           | 2.37203197479248  | 8.45 M               | 135.12 M        |
 
-<!-- 根据上表可知，乘以2时，准确率最高并且模型参数数目较少，FLOPS较小。因此乘以2是最佳选项 -->
 According to the table above, in this particular case, when multiplied by 2, the accuracy of the model is the highest and the number of model parameters is small, resulting in smaller FLOPS. So multiplying by 2 is the best option.
 
 ## 3. You may have noticed, one problem with the channel multiplier is that it scales all layers uniformly, ideally, we would like to be able to construct networks like the following, can you then design a search so that it can reach a network that can have this kind of structure?
-<!-- 可以，只需要设计程序，将`name:"both"`中的 `channel_multiplier`改为(a,b)的形式即可。这样就可以给input fearures 和output features的数目乘以两个不同的值。 -->
+
 Indeed, it is possible to modify the function by adjust the `channel_multiplier` parameter under the case `name: "both"` to take the form of (a, b). 
 This configuration constructed the multiplication of the number of input features and output features by two different values, therefore, makes the network transformations more flexible.
 ```
