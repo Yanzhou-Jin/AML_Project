@@ -156,7 +156,34 @@ It is worth noting that there is only one changeable parameter inplace in `nn.Re
 <!-- 可以，我们只需要定义`search_spaces`，分别改变每一层的`channel_multiplier`即可。像第三问一样，首先建立一个list,存储所有可能的乘数。然后建立包含所有乘数的`search_spaces`。需要注意的是由于三个线性层第一个只改了输出层，第二个将输入和输出scales uniformly，第三个只改变了输入层，因此这三层网络的乘数应该一样。所以严格意义上，这个过程是从list中一一枚举。
 结果如下： -->
 Yes, we only need to define `search_spaces` and change the `channel_multiplier` of each layer separately. Like the third question, first create a list to store all possible multipliers. Then we create `search_spaces` containing all multipliers. It should be noted that since the first of those three linear layers only affects the output layer, the second scales both the input and output uniformly, and the third only modifies the input layer, the multipliers for these three layers of networks should be the same. Therefore, to be extact, this process involves enumerating one by one from the list.
+```
+# base configuration
+pass_base_cfg = {
+    "by": "name",
+    "default": {"config": {"name": None}},
+    ...
+    "seq_blocks_4": { # take seq_block_4 as an example
+        "config": {
+            "name": "both",
+            "channel_multiplier": 1,
+        }
+    },
+    ...
+}
 
+# build a search space
+mul=[1,2,4,8,16,64]
+
+search_spaces = []
+search_history=[]
+for x in (mul):
+    pass_base_cfg[f'seq_blocks_2']['config']['channel_multiplier'] = x
+    pass_base_cfg[f'seq_blocks_4']['config']['channel_multiplier'] = x
+    pass_base_cfg[f'seq_blocks_6']['config']['channel_multiplier'] = x
+    search_spaces.append(copy.deepcopy(pass_base_cfg))
+    search_history.append(x)
+
+```
 The outcome of the search process are as follows.
 
 | Search multipliers | Recorded Accuracies | Recorded Losses | Recorded Latencies | Recorded Model Sizes | Recorded FLOPS |
@@ -169,7 +196,7 @@ The outcome of the search process are as follows.
 | 64           | 0.14880952664784    | 1.608           | 2.37203197479248  | 8.45 M               | 135.12 M        |
 
 <!-- 根据上表可知，乘以2时，准确率最高并且模型参数数目较少，FLOPS较小。因此乘以2是最佳选项 -->
-According to the table above, when multiplied by 2, the accuracy is the highest and the number of model parameters is small, resulting in smaller FLOPS. So multiplying by 2 is the best option.
+According to the table above, in this particular case, when multiplied by 2, the accuracy of the model is the highest and the number of model parameters is small, resulting in smaller FLOPS. So multiplying by 2 is the best option.
 
 ## 3. You may have noticed, one problem with the channel multiplier is that it scales all layers uniformly, ideally, we would like to be able to construct networks like the following, can you then design a search so that it can reach a network that can have this kind of structure?
 <!-- 可以，只需要设计程序，将`name:"both"`中的 `channel_multiplier`改为(a,b)的形式即可。这样就可以给input fearures 和output features的数目乘以两个不同的值。 -->
