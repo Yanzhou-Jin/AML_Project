@@ -1,0 +1,17 @@
+,Ori name,New name,MASE_TYPE,Mase_OP,Original type,Quantized type,Changed,Comment
+0,x,x,placeholder,placeholder,x,x,False,The Actual target is SAME      :x
+1,seq_blocks_0,seq_blocks_0,module,batch_norm1d,BatchNorm1d,BatchNorm1d,False,"The Actual target is SAME      :BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)"
+2,seq_blocks_1,seq_blocks_1,module_related_func,relu,ReLU,ReLUInteger,True,The Actual target is DIFFERENT :ReLUInteger(inplace=True)/ReLU(inplace=True)
+3,seq_blocks_2,seq_blocks_2,module_related_func,linear,Linear,LinearInteger,True,"The Actual target is DIFFERENT :LinearInteger(in_features=16, out_features=64, bias=True)/Linear(in_features=16, out_features=64, bias=True)"
+4,seq_blocks_3,seq_blocks_3,module,batch_norm1d,BatchNorm1d,BatchNorm1d,False,"The Actual target is SAME      :BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)"
+5,seq_blocks_4,seq_blocks_4,module_related_func,relu,ReLU,ReLUInteger,True,The Actual target is DIFFERENT :ReLUInteger(inplace=True)/ReLU(inplace=True)
+6,seq_blocks_5,seq_blocks_5,module_related_func,linear,Linear,LinearInteger,True,"The Actual target is DIFFERENT :LinearInteger(in_features=64, out_features=40, bias=True)/Linear(in_features=64, out_features=40, bias=True)"
+7,seq_blocks_6,seq_blocks_6,module,batch_norm1d,BatchNorm1d,BatchNorm1d,False,"The Actual target is SAME      :BatchNorm1d(40, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)"
+8,seq_blocks_7,seq_blocks_7,module_related_func,relu,ReLU,ReLUInteger,True,The Actual target is DIFFERENT :ReLUInteger(inplace=True)/ReLU(inplace=True)
+9,seq_blocks_8,seq_blocks_8,module_related_func,linear,Linear,LinearInteger,True,"The Actual target is DIFFERENT :LinearInteger(in_features=40, out_features=10, bias=True)/Linear(in_features=40, out_features=10, bias=True)"
+10,seq_blocks_9,seq_blocks_9,module,batch_norm1d,BatchNorm1d,BatchNorm1d,False,"The Actual target is SAME      :BatchNorm1d(10, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)"
+11,seq_blocks_10,seq_blocks_10,module_related_func,relu,ReLU,ReLUInteger,True,The Actual target is DIFFERENT :ReLUInteger(inplace=True)/ReLU(inplace=True)
+12,seq_blocks_11,seq_blocks_11,module_related_func,linear,Linear,LinearInteger,True,"The Actual target is DIFFERENT :LinearInteger(in_features=10, out_features=5, bias=True)/Linear(in_features=10, out_features=5, bias=True)"
+13,seq_blocks_12,seq_blocks_12,module,batch_norm1d,BatchNorm1d,BatchNorm1d,False,"The Actual target is SAME      :BatchNorm1d(5, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)"
+14,seq_blocks_13,seq_blocks_13,module_related_func,relu,ReLU,ReLUInteger,True,The Actual target is DIFFERENT :ReLUInteger(inplace=True)/ReLU(inplace=True)
+15,output,output,output,output,output,output,False,The Actual target is SAME      :output

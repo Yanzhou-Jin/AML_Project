@@ -1,0 +1,7 @@
+,Ori name,New name,MASE_TYPE,Mase_OP,Original type,Quantized type,Changed,Comment
+0,x,x,placeholder,placeholder,x,x,False,The Actual target is SAME      :x
+1,seq_blocks_0,seq_blocks_0,module,batch_norm1d,BatchNorm1d,BatchNorm1d,False,"The Actual target is SAME      :BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)"
+2,seq_blocks_1,seq_blocks_1,module_related_func,relu,ReLU,ReLU,False,The Actual target is SAME      :ReLU(inplace=True)
+3,seq_blocks_2,seq_blocks_2,module_related_func,linear,Linear,LinearInteger,True,"The Actual target is DIFFERENT :LinearInteger(in_features=16, out_features=5, bias=True)/Linear(in_features=16, out_features=5, bias=True)"
+4,seq_blocks_3,seq_blocks_3,module_related_func,relu,ReLU,ReLU,False,The Actual target is SAME      :ReLU(inplace=True)
+5,output,output,output,output,output,output,False,The Actual target is SAME      :output

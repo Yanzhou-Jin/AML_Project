@@ -1,0 +1,7 @@
+Search History,Recorded Accuracies,Recorded Losses,Recorded Latencies,Recorded Model Sizes,Recorded FLOPS
+[1],0.183333335178239,"tensor(1.6014, grad_fn=<DivBackward0>)",0.6363391876220703,3.01 K,47.27 K
+[2],0.2611111189637865,"tensor(1.6086, grad_fn=<DivBackward0>)",0.6094016075134278,10.09 K,159.66 K
+[4],0.10773809892790658,"tensor(1.6197, grad_fn=<DivBackward0>)",0.6248576164245605,36.52 K,581.03 K
+[8],0.05000000021287373,"tensor(1.6231, grad_fn=<DivBackward0>)",0.705734395980835,138.53 K,2.21 M
+[16],0.1886904782482556,"tensor(1.6157, grad_fn=<DivBackward0>)",0.7767936229705811,539.17 K,8.61 M
+[64],0.14880952664784022,"tensor(1.6080, grad_fn=<DivBackward0>)",2.3720319747924803,8.45 M,135.12 M

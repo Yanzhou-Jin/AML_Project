@@ -1,0 +1,17 @@
+Search History,Recorded Accuracies,Recorded Losses,Recorded Latencies,Recorded Model Sizes,Recorded FLOPS
+"[(16, 8), (16, 8)]",tensor(0.4619),"tensor(1.4052, grad_fn=<DivBackward0>)",0.897555160522461,117,1.92 K
+"[(16, 8), (8, 6)]",tensor(0.3833),"tensor(1.3450, grad_fn=<DivBackward0>)",0.7963071823120117,117,1.92 K
+"[(16, 8), (8, 4)]",tensor(0.3946),"tensor(1.4073, grad_fn=<DivBackward0>)",0.7559936046600342,117,1.92 K
+"[(16, 8), (4, 2)]",tensor(0.4740),"tensor(1.3121, grad_fn=<DivBackward0>)",0.7707903861999512,117,1.92 K
+"[(8, 6), (16, 8)]",tensor(0.4577),"tensor(1.3444, grad_fn=<DivBackward0>)",0.7152575969696044,117,1.92 K
+"[(8, 6), (8, 6)]",tensor(0.4262),"tensor(1.4500, grad_fn=<DivBackward0>)",0.663424015045166,117,1.92 K
+"[(8, 6), (8, 4)]",tensor(0.5280),"tensor(1.3069, grad_fn=<DivBackward0>)",0.7782464027404785,117,1.92 K
+"[(8, 6), (4, 2)]",tensor(0.5155),"tensor(1.3352, grad_fn=<DivBackward0>)",0.7366399765014648,117,1.92 K
+"[(8, 4), (16, 8)]",tensor(0.4452),"tensor(1.3179, grad_fn=<DivBackward0>)",0.7376512050628662,117,1.92 K
+"[(8, 4), (8, 6)]",tensor(0.4280),"tensor(1.4479, grad_fn=<DivBackward0>)",0.7029183864593506,117,1.92 K
+"[(8, 4), (8, 4)]",tensor(0.4417),"tensor(1.3729, grad_fn=<DivBackward0>)",0.6693952083587646,117,1.92 K
+"[(8, 4), (4, 2)]",tensor(0.3512),"tensor(1.3605, grad_fn=<DivBackward0>)",0.680998420715332,117,1.92 K
+"[(4, 2), (16, 8)]",tensor(0.5274),"tensor(1.2297, grad_fn=<DivBackward0>)",0.6494400024414062,117,1.92 K
+"[(4, 2), (8, 6)]",tensor(0.5442),"tensor(1.1933, grad_fn=<DivBackward0>)",0.7187967777252198,117,1.92 K
+"[(4, 2), (8, 4)]",tensor(0.5500),"tensor(1.3200, grad_fn=<DivBackward0>)",0.8933183670043945,117,1.92 K
+"[(4, 2), (4, 2)]",tensor(0.4238),"tensor(1.3691, grad_fn=<DivBackward0>)",0.6513023853302002,117,1.92 K
