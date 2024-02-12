@@ -144,7 +144,7 @@ The jargons will be explained below:
 
 5. **call_method** call_method stands for the nn.model layers. In this task, it usually corresponds to `nn.Linear`, `nn.ReLU`, and `nn.BatchNorm1d`.
 
-6. **output** contains the output of the traced function in its args[0] attribute. 
+6. **output** contains the output of the traced function in its attribute. 
 
 
 ## 2. What are the functionalities of `profile_statistics_analysis_pass` and `report_node_meta_param_analysis_pass` respectively?
