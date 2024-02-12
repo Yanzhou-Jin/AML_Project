@@ -229,7 +229,7 @@ A search similar to Q2 is performed, and the search results are shown in the fol
 
 Where the Search History represents the `channel_multipliers` for each layer. Only the data in '()' is important, they represent the `channel_multipliers` of the input and output features of the three linear layers. It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1] (This is not intuitive, a figure of the optimal configuration is illustrated below), the accuracy reaches the highest value of $0.251349210739136$. This is when the model size is smaller and performs best.
 
-<img src="imgs/P2.png" width="800" />
+<img src="imgs/P2.png" width="400" />
 
 It can be seen from the figure that the shape of this model is quite similar with the model tuned manually in Lab1.
 
