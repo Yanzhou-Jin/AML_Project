@@ -1,4 +1,4 @@
-![image](https://github.com/Yanzhou-Jin/AML_Project/assets/90556741/2c992a30-e9cb-4ba6-b21e-1b26a665d552)# Lab 1
+# Lab 1
 A base configuration has been established to systematically evaluate the impact of the three key factors on the model. These parameters include batch-size, max-epochs and learning-rate.
 
 * Training with Different Batch Sizes: 64, **256**, 1024
