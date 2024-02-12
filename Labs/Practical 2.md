@@ -121,7 +121,35 @@ It can be observed from the table that TPE has better performance than Brute-for
 需要特别声明的是`nn.ReLU`中只有一个可以更改的参数`inplace`，这是一个bool变量，表示是否在原地进行ReLU计算，只要大于0，对于结果都没有影响。因此我认为对于`ReLU`层，无需特别注明参数数目。 -->
 
 The code has been modified to double the parameters of each layer (including ReLU). The modification method includes adding a function called `instantiate_relu` to be able to modify the `ReLU` function. Apart from that, a check of the name parameter is added to the function`redefine_linear_Relu_transform_pass`. If `name` equals to `"inplace"`, the `ReLU` layer will be modified; otherwise, the linear layer is modified.
+```
+def instantiate_relu(inplace):
+    return nn.ReLU(inplace=inplace)
 
+def redefine_linear_Relu_transform_pass(graph, pass_args=None):
+    ...
+    for node in graph.fx_graph.nodes:
+        ...
+        config = main_config.get(node.name, default)['config']
+        name = config.get("name", None)
+        if name is not None:
+            ori_module = graph.modules[node.target]
+            if name == "inplace":
+                ...
+                new_module = instantiate_relu(inplace)
+                ...
+            else:
+                ...
+                if name == "output_only":
+                    ...
+                elif name == "both":
+                    ...
+                elif name == "input_only":
+                    ...
+                new_module = instantiate_linear(in_features, out_features, bias)
+                ...
+    return graph, {}
+mg=reload_mg()
+```
 It is worth noting that there is only one changeable parameter inplace in `nn.ReLU()`, which is a Bool variable indicating whether to perform the `ReLU` operation in origianl place. Thus, as long as it is greater than 0, the result is not affected. Therefore, I think there is no need to specify the number of parameters when making modifications to the ReLU layer.
 
 ## 2. In lab3, we have implemented a grid search, can we use the grid search to search for the best channel multiplier value?
