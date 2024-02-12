@@ -298,4 +298,36 @@ Then, run `./ch transform --config configs/examples/jsc_toy_by_type_my.toml --ta
 
 In this task, a self-defined pass `calculate_flops_bitops_pass` is introduced. 
 <!-- 在这个pass中，使用deepspeed中的`get_model_profile()`获取模型的Flops，然后遍历了`mg`中的所有node并统计bit操作，从而获取Bitops.使用训练好的模型`jsc-toy10X`来进行分析，程序运行正常，输出结果为`Total BitOPs: 162368, Total FLOPs: 67.78 K`。 -->
-In this pass, `get_model_profile()` in deepspeed is used to get the Flops of the model, then iterated all the nodes in `mg` and counted the bit operations to get the Bitops.The trained model `jsc-toy10X` is used to perform the analysis, the program runs fine and the output is ` Total BitOPs: 162368, Total FLOPs: 67.78 K`.
+```
+def calculate_flops_bitops_pass(graph, pass_args: dict):
+
+    flops, macs, params = get_model_profile(model=graph.model, input_shape=tuple([8,16]))
+    ...
+    for node in graph.fx_graph.nodes:
+        ...
+        if mase_type in ["module", "module_related_func"]:
+            if mase_op in ["linear", "conv2d", "conv1d"]:
+                ...
+                data_in_cost += sum(data_in_0_meta["precision"]) * d_size
+                weights_cost += sum(w_meta["precision"]) * w_size
+
+    # on average how many bits do we pay per value?
+    data_sum_bit = data_in_cost
+    w_sum_bit = weights_cost
+    total_bitops = data_sum_bit+w_sum_bit
+    total_flops=flops
+    dict={
+        "total_flops": total_flops,
+        "total_bitops": total_bitops,
+        }
+    return graph, dict
+
+```
+In this pass, `get_model_profile()` in deepspeed is used to get the Flops of the model, then enumerated all the nodes in `mg` and counted the bit operations to get the Bitops. This pass takes a Masegraph object `graph` and a dictionary `pass_args` as input and return original `graph` and a new dictionary `dict` containing `total_flops` and `total_bitops` as result. This pass can be called using `calculate_flops_bitops_pass(mg, pass_args)`, here is an example.
+
+```
+mg, ans = calculate_flops_bitops_pass(mg, pass_args)
+print("Total BitOPs:", ans["total_bitops"])
+print("Total FLOPs:", ans["total_flops"])
+```
+In this task, the trained model `jsc-toy10X` is used to perform the analysis, the program runs fine and the output is ` Total BitOPs: 162368, Total FLOPs: 67.78 K`.
