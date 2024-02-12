@@ -101,20 +101,20 @@ Brute-force Search： Brute-force 搜索方法简单直接，它会尝试所有�
 TPE-based Search： TPE（Tree-structured Parzen Estimator）是一种基于贝叶斯优化的方法，它通过构建一个概率模型来估计不同超参数配置的性能，并选择最有希望的配置进行下一次评估。与brute-force搜索相比，TPE-based搜索方法通常更加高效，因为它能够在搜索过程中根据之前的结果动态调整搜索空间，更有效地探索有可能产生更好性能的超参数配置。这种动态调整的特性使得TPE-based搜索在给定样本数量的情况下通常能够找到更好的超参数配置。
 
 综上所述，TPE-based搜索方法通常比brute-force搜索方法具有更高的样本效率，因为它能够更有效地探索超参数空间，并在给定的样本数量下获得更好的性能提升。然而，值得注意的是，TPE-based搜索仍然受到初始样本数量和超参数空间的限制，因此在特定情况下可能会表现不佳。 -->
-"sample efficiency" refers to the relationship between the number of samples required during hyperparameter optimization and the final performance achieved. In other words, it measures how quickly an algorithm improves performance for a given number of samples.
+"sample efficiency" refers to the relationship between the number of samples required during hyperparameter optimization and the final performance it achieved. In other words, it measures how quickly an algorithm improves performance for a given number of samples.
 
 Brute-force Search: The Brute-force search method is simple and straightforward. It tries all possible hyperparameter combinations, so its sample efficiency is usually lower. Its advantage is that it is guaranteed to find the global optimal solution (if the search space is large enough), but the cost is that it requires a lot of computing resources and time. Therefore, in large hyperparameter spaces, brute-force search may be less practical because it is less sample efficient.
 
 TPE-based Search: TPE (Tree-structured Parzen Estimator) is a method based on Bayesian optimization that estimates the performance of different hyperparameter configurations by building a probabilistic model and selects the most promising configuration for the next evaluation. Compared with brute-force search, the TPE-based search method is generally more efficient because it is able to dynamically adjust the search space based on previous results during the search process and more effectively explore hyperparameter configurations that are likely to produce better performance. This dynamic adjustment feature allows TPE-based search to generally find better hyperparameter configurations for a given number of samples.
 
-In summary, the TPE-based search method is generally more sample efficient than the brute-force search method because it is able to explore the hyperparameter space more efficiently and obtain better performance improvement for a given number of samples. However, it is worth noting that TPE-based search is still limited by the initial number of samples and hyperparameter space, and thus may perform poorly in specific situations.
-
 <!--为了验证这一观点，进行了如下实验。为了凸显搜索效率的区别，将`n_trails`缩小到5，对TPE和Brute-force搜索分别进行6组实验，记录Best trails的准确率并统计平均值。-->
-To prove this, the following experiment was conducted. To highlight the difference in search efficiency, `n_trails` was decreased to 5, and 6 sets of experiments were conducted for TPE and Brute-force searches, respectively, where the accuracy of Best trails was recorded and averaged statistically.
-| Sampler |  BF      | TPE      |
+To prove this, the following experiment was conducted. To highlight the difference in search efficiency, `n_trails` was decreased to 1 and `search_space` is expand to approximately double its size. In total, 6 sets of experiments were conducted for TPE and Brute-force searches, respectively, where the accuracy of Best trails was recorded and averaged statistically.
+
+| Sampler |  Brute-force      | TPE      |
 |---------|-------------|-------------|
 |  Best trails accuracy  | 0.4878571429| 0.5005714286|
 
+It can be observed from the table that TPE has better performance than Brute-force search. In conclusion, the TPE search method is generally more sample efficient than the brute-force search method. It can find better . However, it is worth noting that TPE-based search is still limited by the initial number of samples and hyperparameter space, and thus may perform poorly in specific situations.
 # Lab 4:
 ## 1. Can you edit your code, so that we can modify the above network to have layers expanded to double their sizes? Note: you will have to change the ReLU also.
 <!-- 代码被修改了，使得能够将每层的参数乘以2.更改的思路是增加`instantiate_relu`函数,使得ReLU函数也能被修改。同时在`redefine_linear_Relu_transform_pass`中增加对于`name`的判断，如果`name="inplace"`则进入对于ReLU的修改。反之则进入对`linear`层的修改。
