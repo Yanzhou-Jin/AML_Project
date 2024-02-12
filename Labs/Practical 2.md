@@ -58,11 +58,6 @@ For the inconsistency between loss and accuracy, there may be the following reas
 2. If the accuracy of the model is very high, the correct classification probability of most Classes is close to 1. If an error occurs at this time, the accuracy will be reduced very little, but the cross entropy may be very high. Obviously this is not the case in this experiment.
 3. If the model is overfitted, it performs very well on the training set, but performs poorly on the test data. At this time, the loss of the model will be relatively small and the accuracy will be very low. The complexity of this model is very low, the training data is sufficient, and there is no overfitting.
 
-
-
-
-
-
 ## 3. Implement the brute-force search as an additional search method within the system, this would be a new search strategy in MASE.
 
  In Mase, there isn't an integrated brute-force strategy, but such a method can be added to `optuna.py`. We can refer to the documentation page at [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html). To accomplish this, simply add the following lines to the `sampler_map` function:
@@ -189,7 +184,6 @@ This configuration constructed the multiplication of the number of input feature
         }
     },
 ```
-<!-- 考虑到兼容问题，需要修改`redefine_linear_Relu_transform_pass`中name的判断逻辑，通过判断`channel_multiplier`的数据类型，实现对于uniform scales和 nonuniform scales指令的自动识别。 -->
 In light of the compatibility concerns, it is necessary to modify the decision logic of name in `redefine_linear_Relu_transform_pass`, and realize automatic recognition of uniform and nonuniform scales instructions by evaluating the data type of `channel_multiplier`.
 ```
 elif name == "both":
@@ -200,8 +194,6 @@ elif name == "both":
                         in_features = in_features * config["channel_multiplier"][0]
                         out_features = out_features * config["channel_multiplier"][1]
 ```
-<!-- 同时，还需要考虑模型正确性的问题，需要保证上一层的输入和下一层的输出参数数目相同，否则模型不能够正常运行。这样做的思路是首先建立一个list，例如`a=[(1,x),(x,y),(y,1)]`，将相邻两个层的输入和输出定义为相同的参数，在搜索时只需要更改这些参数就行(本例中改变x和y的值即可)，这样就可以保证模型的正确性。
-搜索的结果如下表所示: -->
 Meanwhile, the integrity of the model must be taken into account. It is necessary to ensure that the number of input parameters of the previous layer and the output parameters of the next layer are the same, otherwise the model cannot run normally. The idea is to first create a list, such as `a=[(1,x),(x,y),(y,1)]`, where the input and output parameters of two adjacent layers are defined as identical variables x and y. Consequently, when searching, only these parameters need to be modified (in this case, altering the values of x and y), thereby safeguarding the accuracy and functionality of the model.
 
 A search similar to Q2 is performed, and the search results are shown in the following table:
@@ -235,8 +227,9 @@ A search similar to Q2 is performed, and the search results are shown in the fol
 | [1, (1, 16), (16, 16), (16, 1), 1] | 0.227619051933289   | 1.5767           | 0.733241605758667  | 539.17 K             | 8.61 M          |
 
 
-Where the Search History represents the `channel_multipliers` for each layer. Only the data in '()' is important, they represent the `channel_multipliers` of the input and output features of the three linear layers. It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1], the accuracy reaches the highest value of $0.251349210739136$. This is when the model size is smaller and performs best.
-
+Where the Search History represents the `channel_multipliers` for each layer. Only the data in '()' is important, they represent the `channel_multipliers` of the input and output features of the three linear layers. It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1] (This is not intuitive, a figure of the optimal configuration is illustrated below), the accuracy reaches the highest value of $0.251349210739136$. This is when the model size is smaller and performs best.
+<img src="imgs/P2.png" width="800" />
+It can be seen from the figure that the shape of this model is quite similar with the model tuned manually in Lab1.
 
 ## 4. Integrate the search to the chop flow, so we can run it from the command line.
 
