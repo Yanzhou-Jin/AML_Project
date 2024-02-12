@@ -1,40 +1,26 @@
 # Lab 1
 A base configuration has been established to systematically evaluate the impact of the three key factors on the model. These parameters include batch-size, max-epochs and learning-rate.
 
- <!-- 将根据训练测试训练的精度从以下方面进行评估，如非特别说明，则参数与Base一致。由于本门课注重提升模型运算速度方面，因此我还在训练的时候执行了`$ nivtop`指令 -->
- The accuracy of test, training and validation will be evaluated using the following parameters, the bolded numbers are the values of base. This approach ensures a comprehensive analysis of the model's behavior under different parameter settings.Unless specified, the parameters are consistent with Base. Since this course focuses on improving the model calculation speed, I also executed the `$nivtop` command during training. 
- <!-- 加粗的数字是base的值 -->
-
 * Training with Different Batch Sizes: 64, **256**, 1024
 * Training with Different Epochs： 5, **10**, 15
 * Training with Different Learning Rates 1e-3,**1e-5**, 1e-7
 
 The comparision between each trails is shown as follows：
 
-<img src="imgs/1.png" width="500" />
+<img src="imgs/1.png" width="800" />
 
-<!-- 从图中可以看出，各种参数配置下的训练测试验证准确率接近，没有出现明显的过拟合。这是因为模型只有三层网络，较为简单。
-下面对问题进行分析： -->
-Where BS reffers to batch size, ME reffers to max epoch, and LR7 reffers to `learning rate = 1e-7`.As can be seen from the figure above, the training and test verification accuracy under various parameter configurations are close, and there is no obvious overfitting. This is because the model has only three layers of network and is relatively simple.
+Where BS reffers to batch size, ME reffers to max epoch, and LR7 reffers to `learning rate = 1e-7`. As can be seen from the figure above, the training and test verification accuracy under various parameter configurations are close, and there is no obvious overfitting. This is because the model has only three layers of network and is relatively simple.
 
 The problem is analyzed below:
 ## 1. What is the impact of varying batch sizes and why?
-<!-- 在收敛速度方面，batch size 越大，收敛越慢。其中BS 64 30k step收敛，BS 256 15k step 收敛，但是BS1024没有在10 epoh内收敛。这是因为BS大，导致每个Epoc内的step少，总共10个Epoc只有7k step，因此没有收敛.
 
-在训练速度方面，可以明显感受到BS64的训练时长最大，1024最小。这是因为64每个epoc中step更多，参数更新更频繁。同时注意到1024的GPU占用更高，这说明BS较大时，能够更好的使用GPU资源，进一步使得训练速度加快。
-
-在准确率方面，当批量较小时，模型的准确率更高，因为这样模型可以避免陷入局部最小值并能在10个epoc中获得更多的参数更新。BS64的准确率最高。
-这是因为较大的批量大小可能会导致模型陷入局部最小值或平原区域，使得梯度下降算法无法有效地更新参数。此外，较大的批量大小可能会增加训练过程中的噪声，并使优化过程更加不稳定。 -->
 In terms of convergence speed, the larger the batch size (BS), the slower the convergence. Among them, BS 64 converged at 30k step and BS 256 converged at 15k step, but BS1024 did not converge within 10 epoch. This is because the BS is large, resulting in few steps in each epoch. When BS equals 10, there are only 7k steps in a total of 10 Epocs, so there is no convergence.
 
-In terms of training speed, it can be clearly observed that BS64 has the longest training time and 1024 has the shortest. This is because 64 has more steps in each epoc and parameters are updated more frequently. At the same time, it is noted that the GPU usage of 1024 is higher, which shows that when the BS is larger, GPU resources can be better used, further speeding up the training.
+In terms of training speed, it can be clearly observed that BS64 has the longest training time and 1024 has the shortest. This is because 64 has more steps in each epoc and parameters are updated more frequently. At the same time, it is noted that the GPU usage of 1024 is higher, which shows that when the BS is larger, GPU resources can be better used, further speeding up the training. This is probably because larger batch sizes require more memory, especially when training on the GPU. Smaller batch sizes may require less memory and can be more easily adapted to memory-constrained environments.
 
-In terms of accuracy, the accuracy of the model is higher when BS is smaller because the model can avoid getting stuck in local minima and get more parameter updates in 10 epocs. However, when batch size is too small, it may suffer from underfitting. As oberved, BS64 has the highest accuracy<!-- , but BS8 is clearly suffering from under fitting -->. Therefore, choosing a suitable batch size is important.
+<img src="imgs/7.png" width="500" />
 
-
-<!-- 内存占用： 更大的批量大小需要更多的内存，尤其是在GPU上训练时。较小的批量大小可能需要更少的内存，并且可以更轻松地适应内存受限的环境。
-
-泛化性能： 一般来说，更小的批量大小可能会产生更好的泛化性能，因为它们会导致模型在训练时更多地遇到不同的样本。但是，这并不是绝对的规则，因为不同的批量大小可能会导致不同的正则化效果。 -->
+In terms of accuracy, as shown in the figure above, the accuracy of the model is higher when BS is smaller, because the model can avoid getting stuck in local minima and get more parameter updates in 10 epocs. However, when batch size is too small, it may suffer from underfitting. As oberved, in this particular case, BS64 has the highest accuracy<!-- , but BS8 is clearly suffering from under fitting -->. Therefore, choosing a suitable batch size is important. 
 
 ## 2. What is the impact of varying maximum epoch number?
 
