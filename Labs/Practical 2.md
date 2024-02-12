@@ -234,17 +234,13 @@ A search similar to Q2 is performed, and the search results are shown in the fol
 | [1, (1, 16), (16, 8), (8, 1), 1]   | 0.235714288694518   | 1.5942           | 0.710342407226563  | 273.96 K             | 4.37 M          |
 | [1, (1, 16), (16, 16), (16, 1), 1] | 0.227619051933289   | 1.5767           | 0.733241605758667  | 539.17 K             | 8.61 M          |
 
-<!-- 可以看出，当配置为[1, (1, 1), (1, 2), (2, 1), 1]时，accuracy达到最高值0.251349210739136	。此时模型的大小较小，表现最好。 -->
-只关注圆括号内的数据，他们代表三个线性层的输入输出特征的`channel_multipliers`
+
 Where the Search History represents the `channel_multipliers` for each layer. Only the data in '()' is important, they represent the `channel_multipliers` of the input and output features of the three linear layers. It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1], the accuracy reaches the highest value of $0.251349210739136$. This is when the model size is smaller and performs best.
 
-## 4. Integrate the search to the chop flow, so we can run it from the command line.
-<!-- 设计了代码将上述搜索集成到了chop flow中，使得代码能够在命令行中运行。搜索的任务分为四部分：
-首先在graph.py中新建`GraphSearchSpaceMixedPrecisionPTQmy`函数，用于执行search操作。
-其次，将`redefine_linear_Relu_transform_pass`集成到pass目录中，使得其能够被`GraphSearchSpaceMixedPrecisionPTQmy`调用。在`redefine_linear_Relu_transform_pass`中设置`safe_lock`，确保修改参数后的模型上一层的输出参数数目等于下一层的参数输入数目，确保模型能够正确运行。
 
-输出结果如下所示： -->
-The code was designed to integrate the above search into the chop flow, so that the code can be run on the command line. The search task is divided into four parts:
+## 4. Integrate the search to the chop flow, so we can run it from the command line.
+
+The code was designed to integrate the above search into the chop flow, so that the code can be run on the command line. The search task is divided into several parts:
 First, create a new `GraphSearchSpaceMixedPrecisionPTQmy` function in graph.py to perform search operations.
 ```
 class GraphSearchSpaceMixedPrecisionPTQmy(SearchSpaceBase):
@@ -273,26 +269,16 @@ def redefine_linear_Relu_transform_pass(graph, pass_args=None):
         if get_mase_op(node) not in QUANTIZEABLE_OP:
             continue
         i += 1
-        # if node name is not matched, it won't be tracked
-        # config = main_config.get(node.name, default)['config']
-        config = get_config(pass_args, node.name)
-        name = config.get("name", None)
+       ...
         if name is not None:
             ori_module = graph.modules[node.target]
             if name == "inplace":
-                inplace = ori_module.inplace
-                inplace = inplace * config["channel_multiplier"]
-                new_module = instantiate_relu(inplace)
-                parent_name, name = get_parent_name(node.target)
-                setattr(graph.modules[parent_name], name, new_module)
-                pass
+                ...
             else:
-                in_features = ori_module.in_features
-                out_features = ori_module.out_features
-                bias = ori_module.bias
+               ...
                 if name == "output_only":
                     mul=config["channel_multiplier"]
-                    safe_lock=mul
+                    safe_lock=mul                        # activate safe lock to ensure the multipliers are equal to eachothers
                     out_features = out_features * mul
                 elif name == "both":
                     if type(config["channel_multiplier"])== int:
@@ -302,27 +288,21 @@ def redefine_linear_Relu_transform_pass(graph, pass_args=None):
                         in_features = in_features * mul
                         out_features = out_features * mul
                     else:
-                        in_features = in_features * config["channel_multiplier"][0]
-                        out_features = out_features * config["channel_multiplier"][1]
+                        ...
                 elif name == "input_only":
                     mul=config["channel_multiplier"]
                     if safe_lock !=0:
                         mul=safe_lock
                     in_features = in_features * mul
-                new_module = instantiate_linear(in_features, out_features, bias)
-                parent_name, name = get_parent_name(node.target)
-                setattr(graph.modules[parent_name], name, new_module)
-    print(safe_lock)
+                ...
     return graph, {}
 ```
-The output is as follows:
-
-
+Finally, run the command line in terminal, and obtained output is as follows:
 Best trial(s):
 
 |  | number | software_metrics                        | hardware_metrics                          | scaled_metrics  |
 |------|--------|----------------------------------------|-------------------------------------------|-----------------|
 | 0    | 8      | {'loss': 1.609, 'accuracy': 0.22}      | {'average_bitwidth': 32, 'memory_density': 1.0} | {'accuracy': 0.22} |
-
+It can be seen that the optimal accuracy is similar to that of Q2 and Q3, and the programme runs normally.
 
 
