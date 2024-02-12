@@ -76,7 +76,14 @@ In this problem, a neural network with approximately 10 times the number of para
 During the construction of the model, `sigmoid` and `tanh` were utilized as activation functions, and the values of the input and output features of the different linear layers were tried to ensure that the network had a better performance. This manual tuning of the parameters is very time consuming and the tuning method in Lab4 should be used.
 
 The network structure is shown in the figure below:
+<img src="imgs/5.png" width="500" />
 
+<!-- 从上图可以看出，新模型在原模型的基础上，增加了一个LogicNets Layer，通过增加额外的隐藏层来增加参数量。同时，增加了每个线性层的输入输出参数数量，以增加每层的参数量。 -->
+
+As can be seen from the above figure, the new model adds a LogicNets Layer to the original model to increase the number of parameters by adding additional hidden layers. Also, the number of input and output parameters for each linear layer is increased to increase the number of parameters per layer.
+
+The detailed structure of the 1X and 10X model is list below.
+            ## 10X Model ##
             nn.BatchNorm1d(16),
             nn.ReLU(16),
 
@@ -96,6 +103,7 @@ The network structure is shown in the figure below:
             nn.BatchNorm1d(5),  
             nn.ReLU(5),
 
+            ## 1X Model ##
             nn.BatchNorm1d(16),  # input_quant       # 0
             nn.ReLU(16),  # 1
             nn.Linear(16, 8),  # linear              # 2
@@ -109,11 +117,6 @@ The network structure is shown in the figure below:
             nn.Linear(8, 5),  # 8
             nn.BatchNorm1d(5),  # 9
             nn.ReLU(5),
-
-<!-- 从上图可以看出，新模型在原模型的基础上，增加了一个LogicNets Layer，通过增加额外的隐藏层来增加参数量。同时，增加了每个线性层的输入输出参数数量，以增加每层的参数量。 -->
-
-As can be seen from the above figure, the new model adds a LogicNets Layer to the original model to increase the number of parameters by adding additional hidden layers. Also, the number of input and output parameters for each linear layer is increased to increase the number of parameters per layer.
-
 
 
 ## 5. Test your implementation and evaluate its performance.
