@@ -28,7 +28,7 @@ During the search process, in addition to accuracy and loss, some additional met
 
 ## 2. Implement some of these additional metrics and attempt to combine them with the accuracy or loss quality metric. It’s important to note that in this particular case, accuracy and loss actually serve as the same quality metric (do you know why?).
 
-By implementing such metrics searching on SEARCH SPACE, and obtained the table below:
+By implementing such metrics searching in `search_space`, the following table is obtained:
 
 | Search History    | Recorded Accuracies | Recorded Losses | Recorded Latencies | Recorded Model Sizes | Recorded FLOPS |
 |-------------------|---------------------|-----------------|--------------------|----------------------|-----------------|
@@ -50,8 +50,8 @@ By implementing such metrics searching on SEARCH SPACE, and obtained the table b
 | [(4, 2), (4, 2)]   | 0.490476195301328  | 1.2638          | 1.11920003890991  | 117                  | 1.92 K          |
 
 
-可以看到，[(8, 4), (8, 6)]配置时准确率最高0.533333337732724，是最优解。
-
+<!-- 可以看到,在本次实验的条件下，[('data_in_width', 'data_in_frac_width'), ('weight_width', 'weight_frac_width')]等于[(8, 4), (8, 6)]时准确率最高0.533333337732724，是最优configuration。-->
+It can be seen that under the conditions of this experiment, `[('data_in_width', 'data_in_frac_width'), ('weight_width', 'weight_frac_width')]` is equal to `[(8, 4), (8, 6)]` with the highest accuracy of 0.53333333337732724 , which is the optimal configuration.
 
 <!-- 同时可以注意到，在表格中，accuracy和loss表征了一致的性能，这是因为这是一个由简单模型计算的分类问题，并未出现明显的过拟合。在这种情况下，accuracy and loss 相互关联，可以视为相同的metric。对于分类问题而言，大多数情况下accuracy是被关注的指标，但是accuracy本身是个不可导的方程，因而用交叉熵作为损失函数来优化，但最终关心的还是准确度。
 
@@ -77,20 +77,19 @@ For the inconsistency between loss and accuracy, there may be the following reas
 ## 3. Implement the brute-force search as an additional search method within the system, this would be a new search strategy in MASE.
 <!-- 在Mase中没有集成brute-force的策略，但是可以在`optuna.py`中加入这个方法。参考了https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html 网页。只需要在sampler_map函数中增加如下两行即可完成。
  -->
- In Mase, there isn't an integrated brute-force strategy, but such a method can be added to `optuna.py`. We can refer to the documentation page at https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html. To accomplish this, simply add the following two lines to the `sampler_map` function:
+ In Mase, there isn't an integrated brute-force strategy, but such a method can be added to `optuna.py`. We can refer to the documentation page at [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html). To accomplish this, simply add the following lines to the `sampler_map` function:
 ```
             case "brute-force":
                 sampler = optuna.samplers.BruteForceSampler()
 ```
 and the result are as follows:
 
-Best trial(s):
+Brute force Best trial(s):
 
-|    | number | software_metrics                   | hardware_metrics                                  | scaled_metrics                               |
-|----|--------|------------------------------------|---------------------------------------------------|----------------------------------------------|
-|  0 | 4      | {'loss': 1.436, 'accuracy': 0.476} | {'average_bitwidth': 4.0, 'memory_density': 8.0}  | {'accuracy': 0.476, 'average_bitwidth': 0.8} |
-|  1 | 6      | {'loss': 1.413, 'accuracy': 0.486} | {'average_bitwidth': 16.0, 'memory_density': 2.0} | {'accuracy': 0.486, 'average_bitwidth': 3.2} |
-|  2 | 18     | {'loss': 1.408, 'accuracy': 0.477} | {'average_bitwidth': 8.0, 'memory_density': 4.0}  | {'accuracy': 0.477, 'average_bitwidth': 1.6} |
+|    |   number | software_metrics                   | hardware_metrics                                 | scaled_metrics                               |
+|----|----------|------------------------------------|--------------------------------------------------|----------------------------------------------|
+|  0 |        1 | {'loss': 1.356, 'accuracy': 0.514} | {'average_bitwidth': 8.0, 'memory_density': 4.0} | {'accuracy': 0.514, 'average_bitwidth': 1.6} |
+|  1 |       19 | {'loss': 1.406, 'accuracy': 0.466} | {'average_bitwidth': 4.0, 'memory_density': 8.0} | {'accuracy': 0.466, 'average_bitwidth': 0.8} |
 
 
 
@@ -106,15 +105,15 @@ TPE-based Search： TPE（Tree-structured Parzen Estimator）是一种基于贝�
 
 Brute-force Search: The Brute-force search method is simple and straightforward. It tries all possible hyperparameter combinations, so its sample efficiency is usually lower. Its advantage is that it is guaranteed to find the global optimal solution (if the search space is large enough), but the cost is that it requires a lot of computing resources and time. Therefore, in large hyperparameter spaces, brute-force search may be less practical because it is less sample efficient.
 
-TPE-based Search: TPE (Tree-structured Parzen Estimator) is a method based on Bayesian optimization that estimates the performance of different hyperparameter configurations by building a probabilistic model and selects the most promising configuration for the next evaluation. . Compared with brute-force search, the TPE-based search method is generally more efficient because it is able to dynamically adjust the search space based on previous results during the search process and more effectively explore hyperparameter configurations that are likely to produce better performance. This dynamic adjustment feature allows TPE-based search to generally find better hyperparameter configurations for a given number of samples.
+TPE-based Search: TPE (Tree-structured Parzen Estimator) is a method based on Bayesian optimization that estimates the performance of different hyperparameter configurations by building a probabilistic model and selects the most promising configuration for the next evaluation. Compared with brute-force search, the TPE-based search method is generally more efficient because it is able to dynamically adjust the search space based on previous results during the search process and more effectively explore hyperparameter configurations that are likely to produce better performance. This dynamic adjustment feature allows TPE-based search to generally find better hyperparameter configurations for a given number of samples.
 
 In summary, the TPE-based search method is generally more sample efficient than the brute-force search method because it is able to explore the hyperparameter space more efficiently and obtain better performance improvement for a given number of samples. However, it is worth noting that TPE-based search is still limited by the initial number of samples and hyperparameter space, and thus may perform poorly in specific situations.
 
-Best trial(s):
-|    | number | software_metrics                   | hardware_metrics                                 | scaled_metrics                               |
-|----|--------|------------------------------------|--------------------------------------------------|----------------------------------------------|
-|  0 | 1      | {'loss': 1.429, 'accuracy': 0.485} | {'average_bitwidth': 8.0, 'memory_density': 4.0} | {'accuracy': 0.485, 'average_bitwidth': 1.6} |
-|  1 | 17     | {'loss': 1.439, 'accuracy': 0.427} | {'average_bitwidth': 4.0, 'memory_density': 8.0} | {'accuracy': 0.427, 'average_bitwidth': 0.8} |
+<!--为了验证这一观点，进行了如下实验。为了凸显搜索效率的区别，将`n_trails`缩小到5，对TPE和Brute-force搜索分别进行6组实验，记录Best trails的准确率并统计平均值。-->
+To prove this, the following experiment was conducted. To highlight the difference in search efficiency, `n_trails` was decreased to 5, and 6 sets of experiments were conducted for TPE and Brute-force searches, respectively, where the accuracy of Best trails was recorded and averaged statistically.
+| Sampler |  BF      | TPE      |
+|---------|-------------|-------------|
+|  Best trails accuracy  | 0.4878571429| 0.5005714286|
 
 # Lab 4:
 ## 1. Can you edit your code, so that we can modify the above network to have layers expanded to double their sizes? Note: you will have to change the ReLU also.
