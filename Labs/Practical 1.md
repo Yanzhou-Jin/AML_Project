@@ -70,7 +70,7 @@ In order to verify the relationship between learning rate and batch size, two ad
 <!-- 在这个问题中，一个比 "toy" 网络大约有 10 倍参数量的神经网络被提出。具体而言，原模型327个参数，10X模型有4.4k个参数 这个网络具有更多的层和输入输出特征，以增加模型的复杂度。
 
 网络结构如下图所示： -->
-In this problem, a neural network with approximately 10 times the number of parameters than the "toy" network is proposed. Specifically, the original model has 327 parameters and the 10X model has 4.4k parameters. The 10X network has more layers and input and output features to increase the complexity of the model.
+In this problem, a neural network with approximately 10 times the number of parameters than the "toy" network is proposed. The original model (hereinafter referred to as 1X) comprises 327 parameters, while the model with approximately 10 times more parameters (hereinafter referred to as 10X) consists of 4.4k parameters. The 10X network has more layers and input and output features to increase the complexity of the model.
 
 <!-- 在构建模型的过程中，为了确保网络具有较好的表现，尝试了sigmoid和tanh作为激活函数，尝试了不同线性层的输入输出特征的值。这种手动调整参数的方式非常耗费时间，应当使用Lab4中的调参方法。 -->
 During the construction of the model, `sigmoid` and `tanh` were utilized as activation functions, and the values of the input and output features of the different linear layers were tried to ensure that the network had a better performance. This manual tuning of the parameters is very time consuming and the tuning method in Lab4 should be used.
@@ -80,7 +80,7 @@ The network structure is shown in the figure below:
 
 <!-- 从上图可以看出，新模型在原模型的基础上，增加了一个LogicNets Layer，通过增加额外的隐藏层来增加参数量。同时，增加了每个线性层的输入输出参数数量，以增加每层的参数量。 -->
 
-As can be seen from the above figure, the new model adds a LogicNets Layer to the original model to increase the number of parameters by adding additional hidden layers. Also, the number of input and output parameters for each linear layer is increased to increase the number of parameters per layer.
+As can be seen from the above figure, the new model adds a LogicNets Layer(Linear + BN +ReLU) to the original model to increase the number of parameters by adding additional hidden layers. Also, the number of input and output parameters for each linear layer is increased to increase the number of parameters per layer.
 
 The detailed structure of the 1X and 10X model is list below.
             ## 10X Model ##
