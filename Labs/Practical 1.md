@@ -1,4 +1,4 @@
-# Lab 1
+![image](https://github.com/Yanzhou-Jin/AML_Project/assets/90556741/2c992a30-e9cb-4ba6-b21e-1b26a665d552)# Lab 1
 A base configuration has been established to systematically evaluate the impact of the three key factors on the model. These parameters include batch-size, max-epochs and learning-rate.
 
 * Training with Different Batch Sizes: 64, **256**, 1024
@@ -24,7 +24,6 @@ In terms of accuracy, as shown in the figure above, the accuracy of the model is
 
 ## 2. What is the impact of varying maximum epoch number?
 
-<!-- 对于不同的maximum epoch number，当数值越大时，运算时间越长。在CPU/GPU/RAM占用方面，三次尝试没有明显的区别。对于模型准确率而言，增加最大迭代次数通常会提高模型性能，因为模型有更多更新参数的机会。但是，如果设置的最大迭代次数太高，则模型训练时长会增大，并且一些复杂的模型可能会过拟合训练数据，导致在测试数据上的性能下降（本模型非常简单，没有过拟合出现）。 -->
 <img src="imgs/3.png" width="500" />
 
 For different value of maximum epoch (ME), the running time is longer when the value of ME is larger. 
@@ -34,12 +33,9 @@ In terms of CPU/GPU/RAM usage, there is no significant difference between the th
 For model accuracy, increasing the maximum number of iterations usually improves the model performance because the model has more opportunities to update the parameters. However, if the maximum number of iterations is set too high, the model training time increases and some complex models may overfit the training data, resulting in performance degradation on the test data (this model is very simple and no overfitting occurs).
 
 ## 3. What is happening with a large learning and what is happening with a small learning rate and why? What is the relationship between learning rates and batch sizes?
-<!-- 对于不同的学习率而言，当使用较大的学习率时（例如1e-3），参数更新的步幅会更大，梯度下降的幅度更大，模型收敛到局部最优解的速度更快。这可能导致优化过程不稳定，当步幅过大时甚至无法收敛到最优解，过大学习率可能导致优化过程发散，使得损失函数值不断增加。然而，使用较小的学习率（例如1e-7）会使参数更新的步幅更小，梯度下降的幅度更小，需要更多的steps才能到达收敛。虽然小学习率能够带来更稳定的优化过程，但是，如果学习率设置得太小，优化过程可能会收敛得很慢。在本task中，可以明显看到随着学习率变小，准确率明显下降，这是因为小学习率的模型在10epochs时还没有收敛
 
-为了验证学习率与批量大小之间存在的关系，又追加了两组实验。实验结果表明：通常情况下，较大的批量大小可以支持较大的学习率，因为每个参数更新步骤都基于更多的样本，这可以使梯度估计更稳定。相反，较小的批量大小可能需要较小的学习率，以避免梯度估计的不稳定性和优化过程的不收敛。 -->
-For different learning rates, when a larger learning rate is used (e.g., 1e-3), the step size of the parameter update is larger, the gradient decreases more, and the model converges to the local optimal solution faster. 
-
-This may lead to an unstable optimization process, which may not even converge to the optimal solution when the step size is too large, and a large learning rate may cause the optimization process to diverge, resulting in an increasing loss function value. 
+<img src="imgs/8.png" width="500" />
+For different learning rates, when a larger learning rate is used (e.g., 1e-3), the step size of the parameter update is larger, the gradient decreases faster, and the model converges to the local optimal faster. This may lead to an unstable optimization process, which may not even converge to the optimal solution when the step size is too large, and a large learning rate may cause the optimization process to diverge, resulting in an increasing loss function value. 
 
 However, using a smaller learning rate (e.g., 1e-7) results in smaller steps for parameter updates, smaller gradient decreases, and needed more steps to reach convergence. Although a small learning rate can lead to a more stable optimization process, the optimization process may converge slowly if the learning rate is set too small.
 
@@ -52,19 +48,10 @@ In order to verify the relationship between learning rate and batch size, two ad
 
 ## 4. Implement a network that has in total around 10x more parameters than the toy network.
 
-
-<!-- 在这个问题中，一个比 "toy" 网络大约有 10 倍参数量的神经网络被提出。具体而言，原模型327个参数，10X模型有4.4k个参数 这个网络具有更多的层和输入输出特征，以增加模型的复杂度。
-
-网络结构如下图所示： -->
-In this problem, a neural network with approximately 10 times the number of parameters than the "toy" network is proposed. The original model (hereinafter referred to as 1X) comprises 327 parameters, while the model with approximately 10 times more parameters (hereinafter referred to as 10X) consists of 4.4k parameters. The 10X network has more layers and input and output features to increase the complexity of the model.
-
-<!-- 在构建模型的过程中，为了确保网络具有较好的表现，尝试了sigmoid和tanh作为激活函数，尝试了不同线性层的输入输出特征的值。这种手动调整参数的方式非常耗费时间，应当使用Lab4中的调参方法。 -->
-During the construction of the model, `sigmoid` and `tanh` were utilized as activation functions, and the values of the input and output features of the different linear layers were tried to ensure that the network had a better performance. This manual tuning of the parameters is very time consuming and the tuning method in Lab4 should be used.
-
-The network structure is shown in the figure below:
+In this problem, a neural network with approximately 10 times the number of parameters than the "toy" network is proposed. The original model (hereinafter referred to as 1X) comprises 327 parameters, while the model with approximately 10 times more parameters (hereinafter referred to as 10X) consists of 4.4k parameters. The 10X network has more layers and input and output features to increase the complexity of the model. The network structure is shown in the figure below:
 <img src="imgs/5.png" width="500" />
 
-<!-- 从上图可以看出，新模型在原模型的基础上，增加了一个LogicNets Layer，通过增加额外的隐藏层来增加参数量。同时，增加了每个线性层的输入输出参数数量，以增加每层的参数量。 -->
+During the construction of the model, `sigmoid` and `tanh` were utilized as activation functions, and the values of the input and output features of the different linear layers were tried to ensure that the network had a better performance. This manual tuning of the parameters is very time consuming and the tuning method in Lab4 should be used.
 
 As can be seen from the above figure, the new model adds a LogicNets Layer(Linear + BN +ReLU) to the original model to increase the number of parameters by adding additional hidden layers. Also, the number of input and output parameters for each linear layer is increased to increase the number of parameters per layer.
 
@@ -114,7 +101,6 @@ In this task, the newly constructed network with 10X parameters was evaluated, i
 | 1X    | 0.7349      | 0.7276    | 0.7359         |
 | 10X   | 0.7464      | 0.7443    | 0.7463         |
 
-<!-- It can be interpreted that, 通过实施更大规模的网络，扩展了模型的参数容量，模型的测试准确率有小幅度的提高，并且训练和验证准确率也相应提高，没有过拟合出现。 -->
 It can be interpreted that, by implementing a larger network that extends the parameter capacity of the model, there is a small increase in the testing accuracy of the model and a corresponding increase in training and validation accuracy with no overfitting occurring.
 
 
@@ -175,16 +161,15 @@ In Conclusion:
 
 
 ## 3. Explain why only 1 OP is changed after the `quantize_transform_pass` .
-  <!-- `quantize_transform_pass`里提到的 "Quantisation" 是指量化，即将神经网络中的权重和激活值转换为具有较低表示位数的整数或定点数。这个过程有助于减少模型的计算和内存需求，特别是对于在资源受限环境中运行的模型。 -->
-  The "quantize" mentioned in `quantize_transform_pass` refers to quantization, that is, converting the weights and activation values in the neural network into integers or fixed-point numbers with a lower representation number. This process helps reduce the computational and memory requirements of the model, especially for models running in resource-constrained environments.
 
-  <!-- 在程序中，字典`pass_args`中的`"by"`的值为`“type”`, therefore, 只有 `graph_iterator_quantize_by_type`被执行, and `pass_args` 的`config`项中只包含`linear`, thus, only the OP `type="linear"` is changed. -->
-  In the program, the value of `"by"` in the dictionary `pass_args` is `"type"`, therefore, only `graph_iterator_quantize_by_type` is executed. Besides, the `config` item of `pass_args` only contains `linear`, thus , only the OP `type="linear"` is changed. The result is shown in the following table.
+The "quantize" mentioned in `quantize_transform_pass` refers to quantization, that is, converting the weights and activation values in the model into fixed-point numbers with a lower representation number. This process helps reduce the computational and memory requirements of the model, especially for models running in resource-constrained environments. 
+
+In the program, the value of `"by"` in the dictionary `pass_args` is `"type"`, therefore, only `graph_iterator_quantize_by_type` is executed. Besides, the `config` item of `pass_args` only contains `linear`, thus , only the OP `type="linear"` is changed. The result is shown in the following table.
 
 | Original type   | OP           |   Total |   Changed |   Unchanged |
 |-----------------|--------------|---------|-----------|-------------|
 | BatchNorm1d     | batch_norm1d |       1 |         0 |           1 |
-| Linear          | linear       |       1 |         1 |           0 |
+| **Linear**          | **linear**       |       **1** |         **1** |           **0** |
 | ReLU            | relu         |       2 |         0 |           2 |
 | output          | output       |       1 |         0 |           1 |
 | x               | placeholder  |       1 |         0 |           1 |
@@ -192,7 +177,6 @@ In Conclusion:
 
 ## 4. Write some code to traverse both `mg` and `ori_mg`, check and comment on the nodes in these two graphs.
 
-<!-- 在这个问题中，我建立了与第前问相似的pass`summarize_quantization_analysis_pass_my`,在这个pass中，执行`graph_iterator_compare_nodes_my`。这个函数是从`graph_iterator_compare_nodes`修改而来，对`mg` and `ori_mg`中的每一个node进行对比，并且根据是否相同生成评论。 -->
 In this problem, a pass `summarize_quantization_analysis_pass_my` is created similar to the previous question, in which `graph_iterator_compare_nodes_my` is executed. This function, modified from `graph_iterator_compare_nodes`, compares each node in `mg` and `ori_mg` and generates comments based on whether they are the same.
 
 The result is shown as follows：
@@ -202,7 +186,7 @@ The result is shown as follows：
 | x           | x              | placeholder         | placeholder | x             | x               | False   | The Actual target is SAME      :x        |
 | seq_blocks_0| seq_blocks_0   | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   | The Actual target is SAME      :BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)|
 | seq_blocks_1| seq_blocks_1   | module_related_func | relu        | ReLU          | ReLU            | False   | The Actual target is SAME      :ReLU(inplace=True)|
-| seq_blocks_2| seq_blocks_2   | module_related_func | linear      | Linear        | LinearInteger  | True    | The Actual target is DIFFERENT :LinearInteger(in_features=16, out_features=5, bias=True)/Linear(in_features=16, out_features=5, bias=True)|
+| **seq_blocks_2**| **seq_blocks_2**   | **module_related_func** | **linear**      | **Linear**        | **LinearInteger**  | **True**    | **The Actual target is DIFFERENT :LinearInteger(in_features=16, out_features=5, bias=True)/Linear(in_features=16, out_features=5, bias=True)**|
 | seq_blocks_3| seq_blocks_3   | module_related_func | relu        | ReLU          | ReLU            | False   | The Actual target is SAME      :ReLU(inplace=True)|
 | output      | output         | output              | output      | output        | output          | False   | The Actual target is SAME      :output    |
 
@@ -217,8 +201,8 @@ the result is shown as follows:
 | Original type   | OP           |   Total |   Changed |   Unchanged |
 |-----------------|--------------|---------|-----------|-------------|
 | BatchNorm1d     | batch_norm1d |       5 |         0 |           5 |
-| Linear          | linear       |       4 |         4 |           0 |
-| ReLU            | relu         |       5 |         5 |           0 |
+| **Linear**          | **linear**       |       **4** |         **4** |           **0** |
+| **ReLU**            | **relu**         |       **5** |         **5** |           **0** |
 | output          | output       |       1 |         0 |           1 |
 | x               | placeholder  |       1 |         0 |           1 |
 
@@ -230,24 +214,24 @@ Also, the `mg` and 'ori_mg` is traversed, indicating the sequence block 1, 2, 4,
 |----------------|-----------------|---------------------|-------------|---------------|-----------------|---------|
 | x              | x               | placeholder         | placeholder | x             | x               | False   |
 | seq_blocks_0   | seq_blocks_0    | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   |
-| seq_blocks_1   | seq_blocks_1    | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
-| seq_blocks_2   | seq_blocks_2    | module_related_func | linear      | Linear        | LinearInteger  | True    |
+| **seq_blocks_1**   | **seq_blocks_1**    | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
+| **seq_blocks_2**   | **seq_blocks_2**    | module_related_func | linear      | Linear        | LinearInteger  | True    |
 | seq_blocks_3   | seq_blocks_3    | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   |
-| seq_blocks_4   | seq_blocks_4    | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
-| seq_blocks_5   | seq_blocks_5    | module_related_func | linear      | Linear        | LinearInteger  | True    |
+| **seq_blocks_4**   | **seq_blocks_4**    | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
+| **seq_blocks_5**   | **seq_blocks_5**    | module_related_func | linear      | Linear        | LinearInteger  | True    |
 | seq_blocks_6   | seq_blocks_6    | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   |
-| seq_blocks_7   | seq_blocks_7    | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
-| seq_blocks_8   | seq_blocks_8    | module_related_func | linear      | Linear        | LinearInteger  | True    |
+| **seq_blocks_7**   | **seq_blocks_7**    | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
+| **seq_blocks_8**   | **seq_blocks_8**    | module_related_func | linear      | Linear        | LinearInteger  | True    |
 | seq_blocks_9   | seq_blocks_9    | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   |
-| seq_blocks_10  | seq_blocks_10   | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
-| seq_blocks_11  | seq_blocks_11   | module_related_func | linear      | Linear        | LinearInteger  | True    |
+| **seq_blocks_10**  | **seq_blocks_10**   | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
+| **seq_blocks_11**  | **seq_blocks_11**   | module_related_func | linear      | Linear        | LinearInteger  | True    |
 | seq_blocks_12  | seq_blocks_12   | module              | batch_norm1d| BatchNorm1d  | BatchNorm1d    | False   |
-| seq_blocks_13  | seq_blocks_13   | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
+| **seq_blocks_13**  | **seq_blocks_13**   | module_related_func | relu        | ReLU          | ReLUInteger    | True    |
 | output         | output          | output              | output      | output        | output          | False   |
 
 
 ## 6. Write code to show and verify that the weights of these layers are indeed quantised. You might need to go through the source code of the implementation of the quantisation pass and also the implementation of the [Quantized Layers](../../machop/chop/passes/transforms/quantize/quantized_modules/linear.py) .
-<!-- 在本问中，仍然使用第三四问所采用的`jsc-tiny` model。根据先前问的结果，应该只有中间的linear层被改变。检查是否被quantised的最直接的办法是输出quantized weights。然而输出所有的weights不够直观，因此在文本呈现时选用precision。 -->
+
 In this question, the `jsc-tiny` model used in Q3 and Q4 is still used, and based on the results of the previous question, only the middle linear layer should be quantized. The most straightforward way to check whether it has been quantized is to output the quantized weights; however, outputting all the weights will take up too much space, so precision was chosen for the text presentation.
 
 | type      | mase_op | shape  | precision |
@@ -255,8 +239,8 @@ In this question, the `jsc-tiny` model used in Q3 and Q4 is still used, and base
 | quantised | relu    | 8, 16  |     32    |
 | original  | relu    | 8, 16  |     32    |
 |-----------|---------|--------|-----------|
-| quantised | linear  | 8, 16  |   8, 4    |
-| original  | linear  | 8, 16  |     32    |
+| **quantised** | **linear**  | **8**, **16**  |   **8**, **4**    |
+| **original**  | **linear**  | **8**, **16**  |     **32**    |
 |-----------|---------|--------|-----------|
 | quantised | relu    | 8, 5   |     32    |
 | original  | relu    | 8, 5   |     32    |
@@ -283,7 +267,6 @@ Then, run `./ch transform --config configs/examples/jsc_toy_by_type_my.toml --ta
 ## \[Optional] Write your own pass
 
 In this task, a self-defined pass `calculate_flops_bitops_pass` is introduced. 
-<!-- 在这个pass中，使用deepspeed中的`get_model_profile()`获取模型的Flops，然后遍历了`mg`中的所有node并统计bit操作，从而获取Bitops.使用训练好的模型`jsc-toy10X`来进行分析，程序运行正常，输出结果为`Total BitOPs: 162368, Total FLOPs: 67.78 K`。 -->
 ```
 def calculate_flops_bitops_pass(graph, pass_args: dict):
 
