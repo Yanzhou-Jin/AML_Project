@@ -162,10 +162,10 @@ pass_base_cfg = {
     "by": "name",
     "default": {"config": {"name": None}},
     ...
-    "seq_blocks_4": { # take seq_block_4 as an example
+    "seq_blocks_4": {                 # take seq_block_4 as an example
         "config": {
             "name": "both",
-            "channel_multiplier": 1,
+            "channel_multiplier": 1,  # In Bases configuration, channel_multiplier is set to 1
         }
     },
     ...
@@ -225,7 +225,7 @@ elif name == "both":
 搜索的结果如下表所示: -->
 Meanwhile, the integrity of the model must be taken into account. It is necessary to ensure that the number of input parameters of the previous layer and the output parameters of the next layer are the same, otherwise the model cannot run normally. The idea is to first create a list, such as `a=[(1,x),(x,y),(y,1)]`, where the input and output parameters of two adjacent layers are defined as identical variables x and y. Consequently, when searching, only these parameters need to be modified (in this case, altering the values of x and y), thereby safeguarding the accuracy and functionality of the model.
 
-The search results are shown in the following table:
+A search similar to Q2 is performed, and the search results are shown in the following table:
 
 | Search History                     | Recorded Accuracies | Recorded Losses | Recorded Latencies | Recorded Model Sizes | Recorded FLOPS |
 |------------------------------------|---------------------|------------------|---------------------|----------------------|-----------------|
@@ -256,7 +256,8 @@ The search results are shown in the following table:
 | [1, (1, 16), (16, 16), (16, 1), 1] | 0.227619051933289   | 1.5767           | 0.733241605758667  | 539.17 K             | 8.61 M          |
 
 <!-- 可以看出，当配置为[1, (1, 1), (1, 2), (2, 1), 1]时，accuracy达到最高值0.251349210739136	。此时模型的大小较小，表现最好。 -->
-It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1], the accuracy reaches the highest value of $0.251349210739136$. This is when the model size is smaller and performs best.
+只关注圆括号内的数据，他们代表三个线性层的输入输出特征的`channel_multipliers`
+Where the Search History represents the `channel_multipliers` for each layer. Only the data in '()' is important, they represent the `channel_multipliers` of the input and output features of the three linear layers. It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1], the accuracy reaches the highest value of $0.251349210739136$. This is when the model size is smaller and performs best.
 
 ## 4. Integrate the search to the chop flow, so we can run it from the command line.
 <!-- 设计了代码将上述搜索集成到了chop flow中，使得代码能够在命令行中运行。搜索的任务分为四部分：
@@ -266,8 +267,75 @@ It can be seen that when the configuration is [1, (1, 1), (1, 2), (2, 1), 1], th
 输出结果如下所示： -->
 The code was designed to integrate the above search into the chop flow, so that the code can be run on the command line. The search task is divided into four parts:
 First, create a new `GraphSearchSpaceMixedPrecisionPTQmy` function in graph.py to perform search operations.
+```
+class GraphSearchSpaceMixedPrecisionPTQmy(SearchSpaceBase):
+    ...
+    def rebuild_model(self, sampled_config, is_eval_mode: bool = True):
+        ...
+        if True:                                                                    # reload the model evertime, other wise the mutiplier will be very large
+            # assert self.model_info.is_fx_traceable, "Model must be fx traceable"
+            mg = MaseGraph(self.model)
+            mg, _ = init_metadata_analysis_pass(mg, None)
+            mg, _ = add_common_metadata_analysis_pass(
+                mg, {"dummy_in": self.dummy_input, "force_device_meta": False}
+            )
+            self.mg = mg
+        if sampled_config is not None:
+            mg, _ = redefine_linear_Relu_transform_pass(self.mg, sampled_config)     # perform the transform_pass.
+        ...
+```
 Secondly, integrate `redefine_linear_Relu_transform_pass` into the pass directory so that it can be called by `GraphSearchSpaceMixedPrecisionPTQmy`. Set `safe_lock` in `redefine_linear_Relu_transform_pass` to ensure that the number of output parameters of the upper layer of the model after modifying parameters is equal to the number of parameter inputs of the next layer to ensure that the model can run correctly.
-
+```
+def redefine_linear_Relu_transform_pass(graph, pass_args=None):
+    ...
+    safe_lock=0
+    i = 0
+    for node in graph.fx_graph.nodes:
+        if get_mase_op(node) not in QUANTIZEABLE_OP:
+            continue
+        i += 1
+        # if node name is not matched, it won't be tracked
+        # config = main_config.get(node.name, default)['config']
+        config = get_config(pass_args, node.name)
+        name = config.get("name", None)
+        if name is not None:
+            ori_module = graph.modules[node.target]
+            if name == "inplace":
+                inplace = ori_module.inplace
+                inplace = inplace * config["channel_multiplier"]
+                new_module = instantiate_relu(inplace)
+                parent_name, name = get_parent_name(node.target)
+                setattr(graph.modules[parent_name], name, new_module)
+                pass
+            else:
+                in_features = ori_module.in_features
+                out_features = ori_module.out_features
+                bias = ori_module.bias
+                if name == "output_only":
+                    mul=config["channel_multiplier"]
+                    safe_lock=mul
+                    out_features = out_features * mul
+                elif name == "both":
+                    if type(config["channel_multiplier"])== int:
+                        mul=config["channel_multiplier"]
+                        if safe_lock !=0:
+                            mul=safe_lock
+                        in_features = in_features * mul
+                        out_features = out_features * mul
+                    else:
+                        in_features = in_features * config["channel_multiplier"][0]
+                        out_features = out_features * config["channel_multiplier"][1]
+                elif name == "input_only":
+                    mul=config["channel_multiplier"]
+                    if safe_lock !=0:
+                        mul=safe_lock
+                    in_features = in_features * mul
+                new_module = instantiate_linear(in_features, out_features, bias)
+                parent_name, name = get_parent_name(node.target)
+                setattr(graph.modules[parent_name], name, new_module)
+    print(safe_lock)
+    return graph, {}
+```
 The output is as follows:
 
 
