@@ -5,7 +5,7 @@ void setup() {
   Serial.begin(9600);
 }
 
-// 可以测量10g-5公斤量程内的所有物体
+// 可以测量10g-5公斤量程内的所有物体a
 // 0N-50N
 
 int MK_Port(int in){
@@ -47,7 +47,7 @@ String summon_command(int a, int b,int c,int d,int e){
   commandline=get_command(commandline,1,b,200,-1);
   commandline=get_command(commandline,2,c,200,-1);
   commandline=get_command(commandline,3,d,200,-1);
-  // commandline=get_command(commandline,4,e,-1,-1);
+  commandline=get_command(commandline,4,e,-1,-1);
   commandline += "<cr>";
   return commandline;
 }
@@ -73,13 +73,23 @@ void loop() {
     // flag=MK_Port(inByte);
     input=readNumberFromSerial();
   }
-  if (input==1){//初始姿态，-1代表空，5个数代表5个关节的值，从下到上01234共5个关节，0-2500取值
+  if (input==2){//初始姿态，-1代表空，5个数代表5个关节的值，从下到上01234共5个关节，0-2500取值
     command=summon_command(1500,1300,1400,600,-1);
     Serial.println(command);
     input=0; 
   }
-  if (input==2){//抓取姿态
+  if (input==1){//抓取姿态
     command=summon_command(1500,2000,200,600,-1);
+    Serial.println(command);
+    input=0; 
+  }
+  if (input==3){//抓
+    command=summon_command(1500,1300,1400,600,1);
+    Serial.println(command);
+    input=0; 
+  }
+  if (input==4){//抓
+    command=summon_command(1500,1300,1400,600,2499);
     Serial.println(command);
     input=0; 
   }
