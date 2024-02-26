@@ -139,7 +139,7 @@ void loop() {
   }
   if (input==4){//抓
     grasping=0;
-    command=summon_command(-1,-1,-1,-1,2499);
+    command=summon_command(-1,-1,-1,-1,2100);
     Serial.println(command);
     for(int i=0;i<5;i++){
             read_rgb();
